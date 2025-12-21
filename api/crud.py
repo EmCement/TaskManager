@@ -211,13 +211,13 @@ async def delete_task(task_id: int):
 
 async def get_comment(comment_id: int):
     try:
-        return await models.Comment.get(id=comment_id)
+        return await models.Comment.get(id=comment_id).prefetch_related('user')
     except DoesNotExist:
         return None
 
 
 async def get_comments_by_task(task_id: int):
-    return await models.Comment.filter(task_id=task_id).all()
+    return await models.Comment.filter(task_id=task_id).prefetch_related('user').all()
 
 
 async def create_comment(comment: schemas.CommentCreate, user_id: int):
@@ -244,13 +244,13 @@ async def delete_comment(comment_id: int):
 
 async def get_attachment(attachment_id: int):
     try:
-        return await models.Attachment.get(id=attachment_id)
+        return await models.Attachment.get(id=attachment_id).prefetch_related('user')
     except DoesNotExist:
         return None
 
 
 async def get_attachments_by_task(task_id: int):
-    return await models.Attachment.filter(task_id=task_id).all()
+    return await models.Attachment.filter(task_id=task_id).prefetch_related('user').all()
 
 
 async def create_attachment(attachment: schemas.AttachmentCreate, user_id: int):

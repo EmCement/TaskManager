@@ -160,6 +160,7 @@ class Task(TaskBase):
 class TaskWithDetails(Task):
     priority: Optional[Priority] = None
     status: Optional[Status] = None
+    project: Optional[Project] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -202,5 +203,17 @@ class Attachment(AttachmentBase):
     task_id: int
     user_id: Optional[int] = None
     uploaded_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CommentWithUser(Comment):
+    user: Optional[User] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AttachmentWithUser(Attachment):
+    user: Optional[User] = None
 
     model_config = ConfigDict(from_attributes=True)

@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import config
+from api.models import User
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -55,7 +56,7 @@ def decode_token(token: str) -> dict:
         )
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     """Получение текущего пользователя из токена"""
     from crud import get_user
 
@@ -79,12 +80,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-async def get_current_active_user(current_user=Depends(get_current_user)):
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:  # Типизация
     """Проверка, что пользователь активен"""
     return current_user
 
 
-async def require_admin(current_user=Depends(get_current_user)):
+async def require_admin(current_user: User = Depends(get_current_user)) -> User:  # Типизация
     """Требуется роль администратора"""
     if current_user.role != "admin":
         raise HTTPException(

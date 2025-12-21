@@ -7,16 +7,15 @@ from auth import get_current_user
 router = APIRouter(prefix="/comments", tags=["comments"])
 
 
-@router.get("/task/{task_id}", response_model=List[schemas.Comment])
+@router.get("/task/{task_id}", response_model=List[schemas.CommentWithUser])
 async def read_comments_by_task(
     task_id: int,
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     """Получить все комментарии по задаче"""
-    # Проверяем существование задачи
     if not await crud.get_task(task_id):
         raise HTTPException(status_code=404, detail="Задача не найдена")
-    
+
     comments = await crud.get_comments_by_task(task_id=task_id)
     return comments
 

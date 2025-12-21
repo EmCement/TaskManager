@@ -23,10 +23,10 @@ CREATE TABLE project (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    created_by INTEGER,
+    created_by_id INTEGER,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_project_creator FOREIGN KEY (created_by)
+    CONSTRAINT fk_project_creator FOREIGN KEY (created_by_id)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 
@@ -51,7 +51,7 @@ CREATE TABLE task (
     project_id INTEGER NOT NULL,
     priority_id INTEGER,
     status_id INTEGER,
-    created_by INTEGER,
+    created_by_id INTEGER,
     due_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -61,7 +61,7 @@ CREATE TABLE task (
         REFERENCES priority(id) ON DELETE SET NULL,
     CONSTRAINT fk_task_status FOREIGN KEY (status_id)
         REFERENCES status(id) ON DELETE SET NULL,
-    CONSTRAINT fk_task_creator FOREIGN KEY (created_by)
+    CONSTRAINT fk_task_creator FOREIGN KEY (created_by_id)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 
@@ -107,11 +107,11 @@ CREATE TABLE attachment (
 CREATE INDEX idx_task_project ON task(project_id);
 CREATE INDEX idx_task_status ON task(status_id);
 CREATE INDEX idx_task_priority ON task(priority_id);
-CREATE INDEX idx_task_created_by ON task(created_by);
+CREATE INDEX idx_task_created_by ON task(created_by_id);
 CREATE INDEX idx_task_due_date ON task(due_date);
 CREATE INDEX idx_comment_task ON comment(task_id);
 CREATE INDEX idx_attachment_task ON attachment(task_id);
-CREATE INDEX idx_project_creator ON project(created_by);
+CREATE INDEX idx_project_creator ON project(created_by_id);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

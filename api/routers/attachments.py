@@ -7,19 +7,17 @@ from auth import get_current_user
 router = APIRouter(prefix="/attachments", tags=["attachments"])
 
 
-@router.get("/task/{task_id}", response_model=List[schemas.Attachment])
+@router.get("/task/{task_id}", response_model=List[schemas.AttachmentWithUser])  # Изменить
 async def read_attachments_by_task(
     task_id: int,
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     """Получить все вложения по задаче"""
-    # Проверяем существование задачи
     if not await crud.get_task(task_id):
         raise HTTPException(status_code=404, detail="Задача не найдена")
-    
+
     attachments = await crud.get_attachments_by_task(task_id=task_id)
     return attachments
-
 
 @router.get("/{attachment_id}", response_model=schemas.Attachment)
 async def read_attachment(

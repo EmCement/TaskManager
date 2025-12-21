@@ -6,10 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import config
 
-# Настройка хеширования паролей
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# OAuth2 схема для получения токена из заголовка
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
@@ -30,7 +27,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
     return encoded_jwt
@@ -61,33 +58,33 @@ def decode_token(token: str) -> dict:
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """Получение текущего пользователя из токена"""
     from crud import get_user
-    
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Не удалось проверить учетные данные",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     payload = decode_token(token)
     user_id: int = payload.get("sub")
     token_type: str = payload.get("type")
-    
+
     if user_id is None or token_type != "access":
         raise credentials_exception
-    
+
     user = await get_user(user_id=int(user_id))
     if user is None:
         raise credentials_exception
-    
+
     return user
 
 
-async def get_current_active_user(current_user = Depends(get_current_user)):
+async def get_current_active_user(current_user=Depends(get_current_user)):
     """Проверка, что пользователь активен"""
     return current_user
 
 
-async def require_admin(current_user = Depends(get_current_user)):
+async def require_admin(current_user=Depends(get_current_user)):
     """Требуется роль администратора"""
     if current_user.role != "admin":
         raise HTTPException(

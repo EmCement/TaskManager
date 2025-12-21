@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 tortoise-orm[asyncpg]
-aerich
 pydantic[email]
 pydantic-settings
 python-multipart

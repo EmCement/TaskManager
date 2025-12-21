@@ -15,7 +15,7 @@ CREATE TABLE "user" (
     full_name VARCHAR(100),
     role VARCHAR(20) DEFAULT 'user',
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_role CHECK (role IN ('admin', 'manager', 'user'))
 );
 
@@ -24,9 +24,9 @@ CREATE TABLE project (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     created_by INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_project_creator FOREIGN KEY (created_by) 
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_project_creator FOREIGN KEY (created_by)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 
@@ -52,27 +52,27 @@ CREATE TABLE task (
     priority_id INTEGER,
     status_id INTEGER,
     created_by INTEGER,
-    due_date TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_task_project FOREIGN KEY (project_id) 
+    due_date TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_task_project FOREIGN KEY (project_id)
         REFERENCES project(id) ON DELETE CASCADE,
-    CONSTRAINT fk_task_priority FOREIGN KEY (priority_id) 
+    CONSTRAINT fk_task_priority FOREIGN KEY (priority_id)
         REFERENCES priority(id) ON DELETE SET NULL,
-    CONSTRAINT fk_task_status FOREIGN KEY (status_id) 
+    CONSTRAINT fk_task_status FOREIGN KEY (status_id)
         REFERENCES status(id) ON DELETE SET NULL,
-    CONSTRAINT fk_task_creator FOREIGN KEY (created_by) 
+    CONSTRAINT fk_task_creator FOREIGN KEY (created_by)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 
 CREATE TABLE task_assignee (
     task_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (task_id, user_id),
-    CONSTRAINT fk_assignee_task FOREIGN KEY (task_id) 
+    CONSTRAINT fk_assignee_task FOREIGN KEY (task_id)
         REFERENCES task(id) ON DELETE CASCADE,
-    CONSTRAINT fk_assignee_user FOREIGN KEY (user_id) 
+    CONSTRAINT fk_assignee_user FOREIGN KEY (user_id)
         REFERENCES "user"(id) ON DELETE CASCADE
 );
 
@@ -81,11 +81,11 @@ CREATE TABLE comment (
     task_id INTEGER NOT NULL,
     user_id INTEGER,
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_comment_task FOREIGN KEY (task_id) 
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_comment_task FOREIGN KEY (task_id)
         REFERENCES task(id) ON DELETE CASCADE,
-    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) 
+    CONSTRAINT fk_comment_user FOREIGN KEY (user_id)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 
@@ -97,10 +97,10 @@ CREATE TABLE attachment (
     filepath VARCHAR(500) NOT NULL,
     size BIGINT,
     mime_type VARCHAR(100),
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_attachment_task FOREIGN KEY (task_id) 
+    uploaded_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_attachment_task FOREIGN KEY (task_id)
         REFERENCES task(id) ON DELETE CASCADE,
-    CONSTRAINT fk_attachment_user FOREIGN KEY (user_id) 
+    CONSTRAINT fk_attachment_user FOREIGN KEY (user_id)
         REFERENCES "user"(id) ON DELETE SET NULL
 );
 

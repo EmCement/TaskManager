@@ -161,6 +161,7 @@ class TaskWithDetails(Task):
     priority: Optional[Priority] = None
     status: Optional[Status] = None
     project: Optional[Project] = None
+    assignees: List[User] = []
 
     model_config = ConfigDict(from_attributes=True)
 

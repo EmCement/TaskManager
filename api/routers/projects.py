@@ -13,8 +13,13 @@ async def read_projects(
     limit: int = 100,
     current_user = Depends(get_current_user)
 ):
-    """Получить список всех проектов"""
-    projects = await crud.get_projects(skip=skip, limit=limit)
+    """Получить список проектов (пользователи видят только свои, админы - все)"""
+    projects = await crud.get_projects(
+        skip=skip, 
+        limit=limit, 
+        user_id=current_user.id,
+        user_role=current_user.role
+    )
     return projects
 
 
@@ -23,8 +28,12 @@ async def read_project(
     project_id: int,
     current_user = Depends(get_current_user)
 ):
-    """Получить проект по ID"""
-    db_project = await crud.get_project(project_id=project_id)
+    """Получить проект по ID (только свой или все для админа)"""
+    db_project = await crud.get_project(
+        project_id=project_id,
+        user_id=current_user.id,
+        user_role=current_user.role
+    )
     if db_project is None:
         raise HTTPException(status_code=404, detail="Проект не найден")
     return db_project
@@ -45,10 +54,15 @@ async def update_project(
     project: schemas.ProjectUpdate,
     current_user = Depends(get_current_user)
 ):
-    """Обновить проект"""
-    db_project = await crud.update_project(project_id=project_id, project=project)
+    """Обновить проект (только свой или все для админа)"""
+    db_project = await crud.update_project(
+        project_id=project_id, 
+        project=project,
+        user_id=current_user.id,
+        user_role=current_user.role
+    )
     if db_project is None:
-        raise HTTPException(status_code=404, detail="Проект не найден")
+        raise HTTPException(status_code=404, detail="Проект не найден или нет доступа")
     return db_project
 
 
@@ -57,8 +71,12 @@ async def delete_project(
     project_id: int,
     current_user = Depends(get_current_user)
 ):
-    """Удалить проект"""
-    db_project = await crud.delete_project(project_id=project_id)
+    """Удалить проект (только свой или все для админа)"""
+    db_project = await crud.delete_project(
+        project_id=project_id,
+        user_id=current_user.id,
+        user_role=current_user.role
+    )
     if db_project is None:
-        raise HTTPException(status_code=404, detail="Проект не найден")
+        raise HTTPException(status_code=404, detail="Проект не найден или нет доступа")
     return None

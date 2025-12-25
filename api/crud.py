@@ -227,6 +227,7 @@ async def create_task(task: schemas.TaskCreate, user_id: int):
     if task.assignee_ids:
         assignees = await models.User.filter(id__in=task.assignee_ids)
         await task_obj.assignees.add(*assignees)
+    await task_obj.fetch_related('assignees')
 
     return task_obj
 
@@ -239,12 +240,13 @@ async def update_task(task_id: int, task: schemas.TaskUpdate, user_id: Optional[
         update_data = task.model_dump(exclude_unset=True, exclude={'assignee_ids'})
         await task_obj.update_from_dict(update_data)
         await task_obj.save()
-
+        
         if task.assignee_ids is not None:
             await task_obj.assignees.clear()
             if task.assignee_ids:
                 assignees = await models.User.filter(id__in=task.assignee_ids)
                 await task_obj.assignees.add(*assignees)
+        await task_obj.fetch_related('assignees')
 
     return task_obj
 
